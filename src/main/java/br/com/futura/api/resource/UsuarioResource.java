@@ -25,8 +25,16 @@ public class UsuarioResource {
 	
 	@PostMapping
 	public ResponseEntity<Response<UsuarioDTO>> criar(@Valid @RequestBody UsuarioDTO dto, BindingResult result) {
+		
 		Response<UsuarioDTO> response = new Response<UsuarioDTO>();
+		
+		if (result.hasErrors()) {
+			result.getAllErrors().forEach(e -> response.getErrors().add(e.getDefaultMessage()));
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+		}
+		
 		Usuario usuario = service.save(dto.convertDtoToEntity());
+		
 		response.setData(dto.convertEntityToDto(usuario));
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
